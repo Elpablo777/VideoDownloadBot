@@ -68,13 +68,18 @@ async function sendToTelegramAdmin(error: Error, info: ExtraErrorInfo) {
 
 export default function report(error: unknown, info: ExtraErrorInfo = {}) {
   console.error(error, info)
-  // if (error instanceof Error) {
-  //   void sendToTelegramAdmin(error, info)
-  // } else if (typeof error === 'string') {
-  //   void sendToTelegramAdmin(new Error(error), info)
-  // }
+  if (error instanceof Error) {
+    void sendToTelegramAdmin(error, info)
+  } else if (typeof error === 'string') {
+    void sendToTelegramAdmin(new Error(error), info)
+  }
 }
 
 function escape(s = '') {
-  return s.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;')
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
 }

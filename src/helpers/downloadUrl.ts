@@ -16,12 +16,16 @@ import report from '@/helpers/report'
 import sendCompletedFile from '@/helpers/sendCompletedFile'
 import unlincSyncSafe from '@/helpers/unlincSyncSafe'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const youtubedl = require('youtube-dl-exec')
+import youtubedl from 'youtube-dl-exec'
 
 export default async function downloadUrl(
   downloadJob: DocumentType<DownloadJob>
 ) {
+  if (!downloadJob.url) {
+    report(new Error('Download job has no URL'), { location: 'downloadUrl' })
+    return
+  }
+
   const fileUuid = uuid()
   const tempDir = env.isDevelopment
     ? resolve(cwd(), 'output')
@@ -55,7 +59,8 @@ export default async function downloadUrl(
     const title = downloadedFileInfo.title
     const ext =
       downloadedFileInfo.ext || downloadedFileInfo.entries?.[0]?.ext || 'mkv'
-    const escapedTitle = (title || '').replace('<', '&lt;').replace('>', '&gt;')
+    // Properly escape title for security
+    const escapedTitle = escapeHtml(title || 'No title')
     const filePath = `${tempDir}/${fileUuid}.${ext}`
     await youtubedl(downloadJob.url, omit(config, 'dumpSingleJson'))
     // Upload
@@ -84,7 +89,7 @@ export default async function downloadUrl(
       downloadJob.url,
       fileId,
       downloadJob.audio,
-      escapedTitle || 'No title'
+      escapedTitle
     )
     downloadJob.status = DownloadJobStatus.finished
     await downloadJob.save()
@@ -113,4 +118,13 @@ export default async function downloadUrl(
       }
     })
   }
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
 }
