@@ -23,11 +23,11 @@
     "grammy": "^1.5.3",
     "grammy-middlewares": "^1.0.11",
     "lodash": "^4.17.21",
-    "mongoose": "^6.1.1",
+    "mongoose": "^6.13.6",
     "mongoose-findorcreate": "^3.0.0",
     "random-token": "^0.0.8",
     "rimraf": "^3.0.2",
-    "sharp": "^0.30.0",
+    "sharp": "^0.32.6",
     "turbo-downloader": "^1.0.9",
     "uuid": "^8.3.2",
     "youtube-dl-exec": "^3.0.7"
